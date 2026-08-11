@@ -1,0 +1,75 @@
+<!doctype html><html lang="ja"><meta charset="utf-8">
+<title>メモ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<style>
+body { margin: 0; font-family: -apple-system, "Hiragino Sans", sans-serif;
+       background: #F7F5F1; color: #29241F; display: flex; min-height: 100vh;
+       align-items: center; justify-content: center; }
+form { width: min(320px, 85vw); text-align: center; }
+input { width: 100%; box-sizing: border-box; font-size: 18px; padding: 12px;
+        border: 1px solid #E5E0D8; border-radius: 8px; background: #fff;
+        text-align: center; -webkit-appearance: none; }
+button { margin-top: 12px; width: 100%; font-size: 16px; padding: 12px;
+         border: none; border-radius: 8px; background: #29241F; color: #fff; }
+#msg { min-height: 1.4em; font-size: 13px; color: #8F1D22; margin-top: 10px; }
+#hint { font-size: 13px; color: #8B8377; margin-bottom: 14px; }
+</style>
+<body>
+<form id="f" style="display:none">
+  <div id="hint">合言葉を入れてください（この端末では次回から不要）</div>
+  <input id="p" type="text" autocomplete="off" autocapitalize="off"
+         autocorrect="off" spellcheck="false" autofocus>
+  <button type="submit">開く</button>
+  <div id="msg"></div>
+</form>
+<script>
+// 全体を即時関数で包む: document.write で流し込む中身のスクリプトと
+// グローバル識別子（DATA等）が衝突しないように（衝突すると中身が動かない）
+(() => {
+const SALT = "plmZ2E/odbpa2bymYi50/g==", IV = "Twuj9QDsPK9ykP3o", DATA = "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", ITER = 600000;
+const LS_KEY = "sm_pass";
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+
+async function tryDecrypt(pass) {
+  const km = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass),
+    "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: b64(SALT), iterations: ITER, hash: "SHA-256" },
+    km, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+  const plain = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: b64(IV) }, key, b64(DATA));
+  return new TextDecoder().decode(plain);
+}
+
+function render(html) {
+  document.open();
+  document.write(html);
+  document.close();
+}
+
+const form = document.getElementById("f");
+form.addEventListener("submit", async e => {
+  e.preventDefault();
+  const pass = document.getElementById("p").value;
+  document.getElementById("msg").textContent = "確認中…";
+  try {
+    const html = await tryDecrypt(pass);
+    localStorage.setItem(LS_KEY, pass);
+    render(html);
+  } catch {
+    document.getElementById("msg").textContent = "合言葉が違います";
+  }
+});
+
+(async () => {
+  const saved = localStorage.getItem(LS_KEY);
+  if (saved) {
+    try { render(await tryDecrypt(saved)); return; }
+    catch { localStorage.removeItem(LS_KEY); }
+  }
+  form.style.display = "";
+})();
+})();
+</script>
